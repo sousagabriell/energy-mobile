@@ -1,0 +1,36 @@
+<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g clip-path="url(#clip0_2_7370)">
+<rect width="110" height="110" fill="white"/>
+<rect x="17" y="18" width="76" height="75" rx="20" fill="url(#pattern0)"/>
+<line y1="9.125" x2="110" y2="9.125" stroke="white" stroke-opacity="0.1"/>
+<line y1="19.2083" x2="110" y2="19.2083" stroke="white" stroke-opacity="0.1"/>
+<line y1="29.2917" x2="110" y2="29.2917" stroke="white" stroke-opacity="0.1"/>
+<line y1="39.375" x2="110" y2="39.375" stroke="white" stroke-opacity="0.1"/>
+<line y1="49.4583" x2="110" y2="49.4583" stroke="white" stroke-opacity="0.1"/>
+<line y1="59.5417" x2="110" y2="59.5417" stroke="white" stroke-opacity="0.1"/>
+<line y1="69.625" x2="110" y2="69.625" stroke="white" stroke-opacity="0.1"/>
+<line y1="79.7083" x2="110" y2="79.7083" stroke="white" stroke-opacity="0.1"/>
+<line y1="89.7917" x2="110" y2="89.7917" stroke="white" stroke-opacity="0.1"/>
+<line y1="99.875" x2="110" y2="99.875" stroke="white" stroke-opacity="0.1"/>
+<line x1="9.125" y1="110" x2="9.12499" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="19.2083" y1="110" x2="19.2083" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="29.2917" y1="110" x2="29.2917" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="39.375" y1="110" x2="39.375" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="49.4583" y1="110" x2="49.4583" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="59.5417" y1="110" x2="59.5417" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="69.625" y1="110" x2="69.625" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="79.7083" y1="110" x2="79.7083" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="89.7917" y1="110" x2="89.7917" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<line x1="99.875" y1="110" x2="99.875" y2="2.00344e-08" stroke="white" stroke-opacity="0.1"/>
+<circle cx="55" cy="55.4583" r="32.5" stroke="black" stroke-opacity="0.1"/>
+</g>
+<defs>
+<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_2_7370" transform="matrix(0.01 0 0 0.0101333 0 -0.00666667)"/>
+</pattern>
+<clipPath id="clip0_2_7370">
+<rect width="110" height="110" fill="white"/>
+</clipPath>
+<image id="image0_2_7370" width="100" height="100" xlink:href="data:image/png;base64,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"/>
+</defs>
+</svg>
