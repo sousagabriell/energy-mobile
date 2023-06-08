@@ -9,6 +9,7 @@ import { api, domain } from '../../services/api'
 import { TextInput } from '../../components/TextInput'
 import { Button } from '../../components/Button'
 import { styles } from './styles'
+import { HeaderScreens } from '../../components/HeaderComponents'
 
 export function Detail() {
   const route = useRoute()
@@ -65,9 +66,9 @@ export function Detail() {
       refresh: updateRow
     })
   }
-
   return (
     <View style={styles.container}>
+            <HeaderScreens />
       <View style={styles.card}>
         <Text style={styles.title}>{column}</Text>
         <Text style={styles.subTitle}>{dataRow}</Text>

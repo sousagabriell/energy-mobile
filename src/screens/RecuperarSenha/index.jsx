@@ -1,13 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from "react-native";
 import { Card, Text } from 'react-native-paper';
 import { Background } from '../../components/Background';
 import { Logo } from '../../components/Logo';
 import { TextInput } from '../../components/TextInput';
 import { Button } from '../../components/Button';
+import { useSheet } from '../../hooks/sheet';
+import { emailValidator } from '../../core/utils'
+
+
 
 
 export function RecuperarSenha({navigation}) {
+  const { forgotPassword } = useSheet()
+  const [email, setEmail] = useState({ value: '', error: '' })
+
+
+  async function setForgotPassword() {
+    const emailError = emailValidator(email.value)
+
+    if(emailError) {
+      setEmail({ ...email, error: emailError })
+      return 
+    }
+    const emailValue = {email: email.value.toLowerCase()}
+    try{
+      navigation.navigate("ConfirmarRecuperacao")  
+      return await forgotPassword(emailValue)
+    }catch (error){
+      if (error.message === 'ERR_NETWORK') {
+        Alert.alert('Erro!', 'Verifique sua conexão com a internet!')
+        setIsLoading(false)
+        return
+      }
+      setEmail({ value: '', error: invalidPassword() })
+    }
+  }
 return (
          <Background>
         <>
@@ -16,8 +44,14 @@ return (
             <Card.Title title="Recuperar Senha"style={styles.borderTitle} subtitleStyle={styles.subtitle} titleStyle={styles.title} ></Card.Title>
             <Text style={styles.subtitle}>Digite o email cadastrado para recuperar senha</Text>
             <Card.Content>
-              <TextInput label="Digite o email cadastrado"/>
-              <Button mode="contained" onPress={() => navigation.navigate('ConfirmarRecuperacao')}>
+              <TextInput 
+              label="Digite o email cadastrado"
+              value={email.value}
+              onChangeText={(text) => setEmail({ value: text, error: '' })}
+              error={!!email.error}
+              errorText={email.error}
+              />
+              <Button mode="contained" onPress={() => setForgotPassword()}>
                 Recuperar Senha
               </Button>
             </Card.Content>

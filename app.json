@@ -8,13 +8,15 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash-energy.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.energycode.energymobile",
       "supportsTablet": true,
@@ -28,7 +30,9 @@
         "foregroundImage": "./assets/icon-energy.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["android.permission.CAMERA"],
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
       "package": "com.energycode.energymobile"
     },
     "web": {
@@ -57,7 +61,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "8ce74e75-418d-4575-b71d-e99c4b6628bf"
+        "projectId": "d1c732be-82a0-4ad3-9ce8-963d21f04506"
       }
     }
   }

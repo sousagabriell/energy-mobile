@@ -4,9 +4,6 @@ import { RFPercentage, RFValue } from 'react-native-responsive-fontsize'
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 0,
-    paddingHorizontal: 24,
-    marginTop: RFPercentage(12),
     backgroundColor: '#F0F2F5'
   },
   card: {

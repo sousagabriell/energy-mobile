@@ -37,7 +37,7 @@ export function AppRoutes() {
         options={{
           tabBarIcon: ({ focused, size, color }) => (
             <MaterialIcons
-            name={focused ? "edit" : "mode-edit"}
+            name={focused ? "home" : "home"}
               size={focused ? 28 : size}
               color={'#fff'}
             />
@@ -72,7 +72,7 @@ export function AppRoutes() {
             <TouchableOpacity onPress={Logout} {...props} />
           ),
           tabBarIcon: ({ size, color }) => (
-            <MaterialIcons name="logout" size={size} color={'#fff'} />
+            <MaterialIcons name="settings" size={size} color={'#fff'} />
           ),
         }}
       />

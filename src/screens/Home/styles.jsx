@@ -38,13 +38,12 @@ export const styles = StyleSheet.create({
     marginTop: 2
   },
   titlePage: {
-    display:'flex',
+    display: 'flex',
     flexDirection: 'row',
     marginTop: '3%',
     paddingLeft: '7%',
     borderBottomColor: '#002A5E',
     borderBottomWidth: 3,
-
   },
   iconTitle: {
     height: 20,
@@ -54,7 +53,7 @@ export const styles = StyleSheet.create({
   },
   btn: {
     flexDirection: 'row',
-    flexWrap:'wrap'
+    flexWrap: 'wrap'
   },
   project: {
     borderColor: '#CFCFCF',
@@ -64,28 +63,73 @@ export const styles = StyleSheet.create({
     marginTop: '5%',
     padding: '3%',
   },
-  infoProject:{
-    display:'flex',
+  infoProject: {
+    display: 'flex',
     flexDirection: 'row',
-    marginBottom: '1%',
   },
-  iconProject:{
+  iconProject: {
     height: 52,
-    width:50,
+    width: 50,
   },
-  titleProject:{
-      fontSize: RFValue(20),
-      color: '#002A5E',
-      fontWeight: 'bold',
-      marginTop: '4%',
-      marginLeft: '3%',
+  titleProject: {
+    fontSize: RFValue(20),
+    color: '#002A5E',
+    fontWeight: 'bold',
+    marginTop: '4%',
+    marginLeft: '3%',
+    width: '80%',
   },
-  dateProject:{
+  dateProject: {
     marginTop: '5%',
     fontSize: RFValue(16),
     marginLeft: '35%',
   },
-  btnMore:{
-    backgroundColor: '#002A5E'
+  btnMore: {
+    backgroundColor: '#002A5E',
+    width: '100%',
+  },
+  list: {
+    height: '100%',
+    backgroundColor: '#fff',
+    position: 'absolute',
+    paddingTop: '30%'
+  },
+  none: {
+    display: 'none',
+  },
+  scroll: {
+    marginBottom: '20%',
+  },
+  textCancel: {
+    backgroundColor: '#D01D28',
+    color: '#ececec',
+    width:'18%',
+    borderRadius: 100,
+    height:'60%',
+    marginRight: '5%'
+  },
+  modalList: {
+    paddingTop: '25%',
+    backgroundColor: '#FFF',
+    marginBottom: '15%'
+  },
+  titleModal: {
+    fontSize: RFValue(20),
+    fontWeight: 'bold',
+    marginTop: '7%',
+    marginLeft: '5%',
+    color: '#002A5E',
+  },
+  divInfo:{
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height:80,
+    borderBottomColor: '#002A5E',
+    borderBottomWidth: 3,
+  },
+  iconQRCode:{
+    marginTop: '8%',
+    marginLeft: '5%'
   }
 })

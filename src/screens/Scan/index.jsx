@@ -51,7 +51,6 @@ export function Scan({ status }) {
   return (
     
     <View style={styles.container}>
-      
       <BarCodeScanner
         onBarCodeScanned={scanned && handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}

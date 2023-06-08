@@ -90,6 +90,14 @@ const SheetProvider = ({ children }) => {
     }
   }, [])
 
+  async function forgotPassword(body) {
+    try {
+      await api.post('auth/users/reset_password/', body,)
+    } catch (error) {
+      throw new Error(String(error.code));
+    }
+  }
+
   useEffect(() => {
     if (isConnected && user.token) {
       setStorage(headers)
@@ -105,6 +113,7 @@ const SheetProvider = ({ children }) => {
         getSpreadSheet,
         getProject,
         updateItemStorage,
+        forgotPassword
       }}
     >
       {children}

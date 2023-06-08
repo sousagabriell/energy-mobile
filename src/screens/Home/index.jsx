@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Text, View, TouchableOpacity, Alert, FlatList, Linking } from 'react-native'
+import { Text, View, TouchableOpacity, Alert, FlatList, Linking, ActivityIndicator, ScrollView } from 'react-native'
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native'
 import { api, domain } from '../../services/api'
 import { useAuth } from '../../hooks/auth'
@@ -14,10 +14,12 @@ import { Button } from '../../components/Button'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRecoilState } from 'recoil'
 import { ProjectAtom } from '../../recoil/atom/projectsAtom'
+import { Modal } from 'react-native-paper'
 
 
 
 export function Home({ navigatior }) {
+  const [modalVisible, setModalVisible] = useState(false);
   const [items, setItems] = useState([])
   const [projectUUID, setProjectUUID] = useState()
   const [rowId, setRowId] = useState()
@@ -27,24 +29,11 @@ export function Home({ navigatior }) {
   const { user, userHeaders } = useAuth()
   const { isConnected } = useConnect()
   const { findStorageData, getSpreadSheet } = useSheet()
-//   const [project, setProjectState] = useState({
-//     "rows":[{
-//       "Ativo Pai": "",
-//       "Ativo Real": "",
-//       "Complemento Localização": "",
-//       "Código At": "",
-//       "Código Instalação": "",
-//       "Código Localização": "",
-//       "Descrição Ativo": "",
-//       "Descrição Instalação": "",
-//       "Descrição Localização": "",
-//       "Tipo Instalação": "",
-//       "Usar Código Ativo": "",
-//       "extra_files": [''],
-//       "id": ""}],
-//     }
-// )
- const [project,setProjectState] = useRecoilState(ProjectAtom);
+  const [isLoading, setIsLoading] = useState(false)
+  const [qrCode, visibleQrCode] = useState("project");
+
+
+  const [project, setProjectState] = useRecoilState(ProjectAtom);
 
 
   const headers = userHeaders()
@@ -65,9 +54,14 @@ export function Home({ navigatior }) {
 
   const [dataProject, setDataProject] = useState([])
 
+
+
   async function getProjects() {
     try {
-      const data = await getSpreadSheet()
+      const response = await api.get(`projects/`, {
+        headers
+      })
+      const data = response.data
       setDataProject(data)
     } catch (error) {
       Alert.alert('Opa', 'Nenhuma informação foi encontrada')
@@ -77,12 +71,14 @@ export function Home({ navigatior }) {
   const setColumns = '@energycode:columns'
 
   const getColumns = useCallback(async (uuid) => {
+    setIsLoading(true)
     const response = await api.get(`get-spreadsheet/${uuid}/`, {
       headers
     })
     const data = response.data
     await AsyncStorage.setItem(setColumns, JSON.stringify(data))
     setProjectState(response.data[0].rows)
+    setIsLoading(false)
     navigation.navigate("Coluna", {
       paramUrl: "/Coluna"
     })
@@ -117,19 +113,13 @@ export function Home({ navigatior }) {
           }
         }
         handleItemUpdate(uuid, rowID)
+        setModalVisible(true)
         return
       }
     }
     updateItemScreen()
   }, [paramUrl, refresh])
 
-
-  function redirect({ uuid }) {
-     setProjectState(getColumns(uuid))
-    navigation.navigate("Coluna", {
-      paramUrl: "/Coluna"
-    })
-  }
 
 
   const handleLinkExtraFile = (link) => {
@@ -152,10 +142,9 @@ export function Home({ navigatior }) {
               <View style={styles.infoProject}>
                 <Image source={require('../../assets/image-25.png')} style={styles.iconProject} />
                 <Text style={styles.titleProject}>{obj.name}</Text>
-                <Text style={styles.dateProject}>{obj.uuid}</Text>
               </View>
               <View style={styles.btn}>
-                <Button mode="contained" style={styles.btnMore} onPress={() => getColumns(obj.uuid)}>
+                <Button mode="contained" style={styles.btnMore} onPress={() => getColumns(obj.id)}>
                   Ver Mais
                 </Button>
               </View>
@@ -182,6 +171,7 @@ export function Home({ navigatior }) {
           <Text style={styles.titleCard}>{item[0]}</Text>
           <Text style={styles.subTitleCard}>{item[1]}</Text>
         </TouchableOpacity>
+
       )
     }
     if (item[0] === 'Arquivos') {
@@ -201,6 +191,7 @@ export function Home({ navigatior }) {
       )
     }
   }
+
   useCallback(() => {
 
   }, [])
@@ -212,19 +203,44 @@ export function Home({ navigatior }) {
         <Image source={require('../../assets/home-alt.png')} style={styles.iconTitle} />
         <Text style={styles.title}>Seus Projetos</Text>
       </View>
-      {renderProject()}
+      {isLoading ? (<ActivityIndicator size="large" />) : (
+        <ScrollView style={styles.scroll}>
+          {renderProject()}
+        </ScrollView>
+
+      )}
+
       {loading ? (
         <Load />
       ) : (
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item[0]}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: 12
-          }}
-        />
+        <Modal
+          animationType="slide"
+          style={[styles.modalList]}
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(true);
+          }}>
+            <View style={styles.divInfo}>
+            <Image source={require('../../assets/menu-grid-o.png')} style={styles.iconQRCode}/>
+
+                    <Text style={styles.titleModal}>Informações do projeto</Text>
+          <Button style={styles.textCancel} onPress={() => setModalVisible(!modalVisible)}>
+          <Image source={require('../../assets/exit.png')} style={styles.exitIcon}/>
+            </Button>
+            </View>   
+            <FlatList
+              data={items}
+              keyExtractor={(item) => item[0]}
+              renderItem={renderItem}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: 12
+              }}
+            />
+
+        </Modal>
       )}
       {!isConnected && <Toast />}
     </View>
