@@ -1,6 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home } from '../screens/Home';
+import { NewHome } from '../screens/NewHome';
+
 import { Scan } from '../screens/Scan';
+import  ScannerScreen  from '../screens/ScannerScreen'
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Logout } from '../components/Logout';
@@ -33,7 +36,7 @@ export function AppRoutes() {
     >
       <Screen
         name="Editar"
-        component={Home}
+        component={NewHome}
         options={{
           tabBarIcon: ({ focused, size, color }) => (
             <MaterialIcons
@@ -46,12 +49,12 @@ export function AppRoutes() {
       />
       <Screen
         name="Escanear"
-        component={Scan}
+        component={ScannerScreen}
         options={{
           tabBarIcon: ({ focused, size, color }) => (
             <MaterialIcons
               name={focused ? "qr-code-scanner" : "qr-code"}
-              size={focused ? 28 : size}
+              size={focused ? 25 : size}
               color={'#002A5E'}
               backgroundColor={'#fff'}
               height={70}

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { View, StyleSheet, Image, Text, ScrollView } from 'react-native'
+import { View, StyleSheet, Image, Text, ScrollView, FlatList, TouchableOpacity } from 'react-native'
 import { HeaderScreens } from '../../components/HeaderComponents';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useRecoilState } from "recoil";
@@ -9,23 +9,30 @@ import {
   CollapseHeader,
   CollapseBody,
 } from 'accordion-collapse-react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Pressable } from 'react-native';
 
 
-export function ColumnDetail({  }) {
+export function ColumnDetail({ }) {
   const [project, setProjectState] = useRecoilState(ProjectAtom);
+  const navigate = useNavigation();
+
 
   useEffect(() => {
+    console.log(project)
   }, [project, setProjectState])
-
 
 
   return (
     <View style={styles.container}>
       <HeaderScreens />
-      <View style={styles.titlePage}>
-        <Image source={require('../../assets/menu-grid-o.png')} style={styles.iconTitle} />
-        <Text style={styles.title}>Informações do Projeto</Text>
+      <View>
+        <Pressable onPress={navigate.goBack} style={styles.titlePage}>
+          <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
+          <Text style={styles.title}>Informações do Projeto</Text>
+        </Pressable>
       </View>
+      {project[0]}
       <ScrollView>
         {project.map(singleProject => {
           return <>
@@ -364,7 +371,7 @@ const styles = StyleSheet.create({
     marginBottom: RFValue(16),
     fontWeight: 'bold',
     marginTop: '1.5%',
-    marginLeft: 4
+    marginLeft: '5%'
   },
   titlePage: {
     display: 'flex',

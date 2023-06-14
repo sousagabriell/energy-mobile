@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, ActivityIndicator, Alert } from 'react-native'
+import { StyleSheet, ActivityIndicator, Alert, ScrollView, View, Image } from 'react-native'
 import { useAuth } from '../../hooks/auth'
 import { theme } from '../../core/theme'
 import { emailValidator, passwordValidator, invalidPassword } from '../../core/utils'
@@ -59,7 +59,11 @@ export function Login({ navigation }) {
   
 
   return (
+    <ScrollView
+    showsVerticalScrollIndicator={false}
+    >
     <Background style={styles.cont}>
+    
       {!isLoading ? (
         <>
           <Card style={styles.card}>
@@ -68,7 +72,7 @@ export function Login({ navigation }) {
             <Card.Content>
               <Text style={styles.label}>Email:</Text>
               <TextInput
-                label="Email"
+                placeholder="Email"
                 returnKeyType="next"
                 value={email.value}
                 onChangeText={(text) => setEmail({ value: text, error: '' })}
@@ -81,7 +85,7 @@ export function Login({ navigation }) {
               />
               <Text style={styles.label}>Senha:</Text>
               <TextInput
-                label="Senha"
+                placeholder="Senha"
                 returnKeyType="done"
                 value={password.value}
                 onChangeText={(text) => setPassword({ value: text, error: '' })}
@@ -96,11 +100,17 @@ export function Login({ navigation }) {
           </Card>
           <Text style={styles.password}>Esqueceu sua senha?</Text>
           <Text style={styles.link}  onPress={() => navigation.navigate('RecuperarSenha')}>Recuperar Senha</Text>
+          <View style={styles.socialmedia}>
+          <Image style={styles.linkedin} source={require('../../assets/linkedin.png')}  />
+          <Image style={styles.whatsapp} source={require('../../assets/whatsapp.png')}  />
+          </View>
         </>
       ) : (
         <ActivityIndicator size="large" />
       )}
     </Background>
+    </ScrollView>
+
   )
 }
 
@@ -148,11 +158,27 @@ const styles = StyleSheet.create({
   password: {
     marginTop: 25,
     color: '#fff',
+    textAlign: 'center'
   },
   link:{
     color: '#01FAFF',
     textDecorationLine: "underline",
     textDecorationStyle: "solid",
-    marginTop: 8
+    marginTop: 8,
+    textAlign: 'center'
   },
+  socialmedia:{
+    flexDirection: 'row',
+    paddingLeft: '28%',
+    width: '100%',
+    paddingTop: '8%',
+    marginTop: '9%',
+    marginBottom: '8%',
+    borderTopColor: '#01FAFF',
+    borderTopWidth: 1,
+  },
+  linkedin: {
+    marginRight: '30%',
+    backgroundColor: '#f1f1f129',
+  }
 })

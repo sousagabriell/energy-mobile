@@ -12,7 +12,8 @@ export const styles = StyleSheet.create({
     color: '#002A5E',
     marginBottom: RFValue(16),
     fontWeight: 'bold',
-    marginTop: '1%',
+    marginTop: '1.5%',
+    marginLeft: '5%'
   },
   floatingButton: {
     position: 'absolute',
@@ -66,10 +67,6 @@ export const styles = StyleSheet.create({
   infoProject: {
     display: 'flex',
     flexDirection: 'row',
-  },
-  iconProject: {
-    height: 52,
-    width: 50,
   },
   titleProject: {
     fontSize: RFValue(20),

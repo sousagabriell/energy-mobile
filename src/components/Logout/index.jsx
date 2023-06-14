@@ -5,6 +5,7 @@ import { HeaderScan } from '../HeaderScan';
 import { api } from '../../services/api'
 import { Button } from '../Button';
 import { Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export function Logout() {
   const { signOut, userHeaders } = useAuth();
@@ -16,6 +17,8 @@ export function Logout() {
   const [lastName, setLastName] = useState([])
 
   const headers = userHeaders()
+  const navigate = useNavigation();
+
 
   async function getUser() {
     try {
@@ -57,35 +60,11 @@ export function Logout() {
   return (
     <View style={styles.centeredView}>
       <HeaderScan style={styles.header} />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Deseja mesmo sair?</Text>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => signOut()}>
-              <Text style={styles.textStyle}>Sim</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.button, styles.buttonCancel]}
-              onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={styles.textCancel} onPress={() => setModalVisible(!modalVisible)}>Cancelar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
       {renderUser()}
       <Pressable
         style={[styles.button, styles.buttonOpen]}
         onPress={() => setModalVisible(true)}>
-        <Text style={styles.textStyle}>Sair</Text>
+        <Text style={styles.textStyle}  onPress={() => signOut()}>Sair</Text>
       </Pressable>
     </View>
   )
@@ -173,5 +152,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBottomColor: '#002A5E',
     marginBottom: '7%'
-  }
+  },
+  titlePage: {
+    display: 'flex',
+    flexDirection: 'row',
+    paddingTop: '3%',
+    paddingLeft: '7%',
+    borderBottomColor: '#002A5E',
+    borderBottomWidth: 3,
+  },
 });

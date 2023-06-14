@@ -66,9 +66,11 @@ export function Detail() {
       refresh: updateRow
     })
   }
+
   return (
     <View style={styles.container}>
             <HeaderScreens />
+            
       <View style={styles.card}>
         <Text style={styles.title}>{column}</Text>
         <Text style={styles.subTitle}>{dataRow}</Text>

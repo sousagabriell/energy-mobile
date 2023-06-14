@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import { Button } from '../../components/Button';
 import { HeaderScreens } from '../../components/HeaderComponents';
+import { HeaderScan } from '../../components/HeaderScan';
 
 export default function ScannerScreen() {
   const navigation = useNavigation()
@@ -11,7 +12,7 @@ export default function ScannerScreen() {
 
   const handleBarCodeScanned = ({ data }) => {
     setScannedCodes([...scannedCodes, data]);
-    return navigation.navigate('Editar', {
+    return navigation.navigate('EditarNovo', {
       paramUrl: data,
     });
   };
@@ -35,6 +36,8 @@ export default function ScannerScreen() {
 
   const renderResults = () => (
     <View style={styles.container}>
+                  <HeaderScan />
+
       <Button
         style={styles.button}
         onPress={startScan}
@@ -45,11 +48,10 @@ export default function ScannerScreen() {
     </View>
   );
 
-  useFocusEffect(
     useCallback(() => {
       startScan();
     }, [])
-  );
+
 
   return scannedCodes.length ? renderResults() : renderScanner();
 }

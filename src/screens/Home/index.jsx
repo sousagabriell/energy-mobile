@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRecoilState } from 'recoil'
 import { ProjectAtom } from '../../recoil/atom/projectsAtom'
 import { Modal } from 'react-native-paper'
+import { Pressable } from 'react-native'
 
 
 
@@ -34,7 +35,6 @@ export function Home({ navigatior }) {
 
 
   const [project, setProjectState] = useRecoilState(ProjectAtom);
-
 
   const headers = userHeaders()
 
@@ -86,7 +86,6 @@ export function Home({ navigatior }) {
   }, [])
 
   useEffect(() => {
-    console.log(project)
   }, [project])
 
   useEffect(() => {
@@ -198,38 +197,13 @@ export function Home({ navigatior }) {
 
   return (
     <View style={styles.container}>
-      <HeaderScreens />
-      <View style={styles.titlePage}>
-        <Image source={require('../../assets/home-alt.png')} style={styles.iconTitle} />
-        <Text style={styles.title}>Seus Projetos</Text>
+    <HeaderScreens />
+    <View>
+      <Pressable onPress={navigation.goBack}  style={styles.titlePage}>
+      <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
+        <Text style={styles.title}>Informações do Projeto</Text>
+        </Pressable>
       </View>
-      {isLoading ? (<ActivityIndicator size="large" />) : (
-        <ScrollView style={styles.scroll}>
-          {renderProject()}
-        </ScrollView>
-
-      )}
-
-      {loading ? (
-        <Load />
-      ) : (
-        <Modal
-          animationType="slide"
-          style={[styles.modalList]}
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(true);
-          }}>
-            <View style={styles.divInfo}>
-            <Image source={require('../../assets/menu-grid-o.png')} style={styles.iconQRCode}/>
-
-                    <Text style={styles.titleModal}>Informações do projeto</Text>
-          <Button style={styles.textCancel} onPress={() => setModalVisible(!modalVisible)}>
-          <Image source={require('../../assets/exit.png')} style={styles.exitIcon}/>
-            </Button>
-            </View>   
             <FlatList
               data={items}
               keyExtractor={(item) => item[0]}
@@ -239,10 +213,6 @@ export function Home({ navigatior }) {
                 paddingBottom: 12
               }}
             />
-
-        </Modal>
-      )}
-      {!isConnected && <Toast />}
-    </View>
+            </View>  
   )
 }
