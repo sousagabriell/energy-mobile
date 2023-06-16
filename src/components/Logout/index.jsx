@@ -41,10 +41,10 @@ export function Logout() {
   }, [])
 
   function renderUser() {
+    console.log(photoProfile)
     return (
       <View style={styles.container}>
         <View style={styles.infoUser}>
-        <Image source={require('../../assets/image-25.png')} style={styles.iconProject} />
         <Text style={styles.titleProject}>{firstName} {lastName}</Text>
         </View>
         <View style={styles.infoUserDetails}>

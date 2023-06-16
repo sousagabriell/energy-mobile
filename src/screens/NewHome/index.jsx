@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native"
 
 export function NewHome() {
     const [dataProject, setDataProject] = useState([])
+    const [dataImage, setImageProject] = useState({})
     const { user, userHeaders } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
     const [project, setProjectState] = useRecoilState(ProjectAtom);
@@ -25,7 +26,7 @@ export function NewHome() {
             headers
         })
         const data = response.data
-        setProjectState(response.data[0].rows)
+        setProjectState(response.data)
         setIsLoading(false)
         navigation.navigate("Coluna", {
             paramUrl: "/Coluna"
@@ -40,15 +41,17 @@ export function NewHome() {
             })
             const data = response.data
             setDataProject(data)
+            console.log(data)
         } catch (error) {
             Alert.alert('Opa', 'Nenhuma informação foi encontrada')
         }
     }
     useEffect(() => {
     }, [project])
-  
+
     useEffect(() => {
         getProjects()
+        console.log(getProjects())
     }, [])
     function renderProject() {
         return (
@@ -56,10 +59,13 @@ export function NewHome() {
                 {dataProject?.map((obj) => {
                     return (
                         <View style={styles.project}>
-                            <View style={styles.infoProject}>
-                                <Image source={require('../../assets/image-25.png')} style={styles.iconProject} />
-                                <Text style={styles.titleProject}>{obj.name}</Text>
-                            </View>
+
+                            <Text style={styles.titleProject}>{obj.name}</Text>
+                            <Text style={styles.subtitleProject}>{obj.size_files_project}</Text>
+                                <Image
+                                    source={{ uri: obj.groups[0].thumbnail }}
+                                    style={{ width: 100, height: 100 }}
+                                />
                             <View>
                                 <Button mode="contained" style={styles.btnMore} onPress={() => getColumns(obj.id)}>
                                     Ver Mais
@@ -76,7 +82,7 @@ export function NewHome() {
         <View style={styles.container}>
             <HeaderScreens />
             <View style={styles.titlePage}>
-                <Text style={styles.title}>Seus Projetos</Text>
+                <Text style={styles.title}>Home</Text>
             </View>
             {isLoading ? (<ActivityIndicator size="large" />) : (
                 <ScrollView style={styles.scroll}>
@@ -220,7 +226,13 @@ const styles = StyleSheet.create({
         marginLeft: '5%'
     },
     btnBack: {
-        width:'10%',
+        width: '10%',
         height: '10%',
+    },
+    subtitleProject: {
+        fontSize: RFValue(20),
+        marginTop: '4%',
+        marginLeft: '3%',
+        width: '80%',
     }
 })

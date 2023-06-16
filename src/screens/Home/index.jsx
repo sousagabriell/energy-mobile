@@ -34,7 +34,6 @@ export function Home({ navigatior }) {
   const [qrCode, visibleQrCode] = useState("project");
 
 
-  const [project, setProjectState] = useRecoilState(ProjectAtom);
 
   const headers = userHeaders()
 
@@ -55,42 +54,6 @@ export function Home({ navigatior }) {
   const [dataProject, setDataProject] = useState([])
 
 
-
-  async function getProjects() {
-    try {
-      const response = await api.get(`projects/`, {
-        headers
-      })
-      const data = response.data
-      setDataProject(data)
-    } catch (error) {
-      Alert.alert('Opa', 'Nenhuma informação foi encontrada')
-    }
-  }
-
-  const setColumns = '@energycode:columns'
-
-  const getColumns = useCallback(async (uuid) => {
-    setIsLoading(true)
-    const response = await api.get(`get-spreadsheet/${uuid}/`, {
-      headers
-    })
-    const data = response.data
-    await AsyncStorage.setItem(setColumns, JSON.stringify(data))
-    setProjectState(response.data[0].rows)
-    setIsLoading(false)
-    navigation.navigate("Coluna", {
-      paramUrl: "/Coluna"
-    })
-    return
-  }, [])
-
-  useEffect(() => {
-  }, [project])
-
-  useEffect(() => {
-    getProjects()
-  }, [])
 
   useEffect(() => {
     async function updateItemScreen() {
@@ -132,27 +95,7 @@ export function Home({ navigatior }) {
     )
     return
   }
-  function renderProject() {
-    return (
-      <>
-        {dataProject?.map((obj) => {
-          return (
-            <View style={styles.project}>
-              <View style={styles.infoProject}>
-                <Image source={require('../../assets/image-25.png')} style={styles.iconProject} />
-                <Text style={styles.titleProject}>{obj.name}</Text>
-              </View>
-              <View style={styles.btn}>
-                <Button mode="contained" style={styles.btnMore} onPress={() => getColumns(obj.id)}>
-                  Ver Mais
-                </Button>
-              </View>
-            </View>
-          )
-        })}
-      </>
-    )
-  }
+
   function renderItem({ item }) {
     if (item[0] !== 'id' && item[0] !== 'Arquivos') {
       return (
@@ -167,8 +110,13 @@ export function Home({ navigatior }) {
             })
           }
         >
-          <Text style={styles.titleCard}>{item[0]}</Text>
-          <Text style={styles.subTitleCard}>{item[1]}</Text>
+          <View style={styles.cardFlex}>
+            <View>
+              <Text style={styles.titleCard}>{item[0]}</Text>
+              <Text style={styles.subTitleCard}>{item[1]}</Text>
+            </View>
+            <Image style={styles.penEdit}source={require('../../assets/pen.png')} />
+          </View>
         </TouchableOpacity>
 
       )
@@ -197,22 +145,22 @@ export function Home({ navigatior }) {
 
   return (
     <View style={styles.container}>
-    <HeaderScreens />
-    <View>
-      <Pressable onPress={navigation.goBack}  style={styles.titlePage}>
-      <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
-        <Text style={styles.title}>Informações do Projeto</Text>
+      <HeaderScreens />
+      <View>
+        <Pressable onPress={navigation.goBack} style={styles.titlePage}>
+          <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
+          <Text style={styles.title}>Editar Informações</Text>
         </Pressable>
       </View>
-            <FlatList
-              data={items}
-              keyExtractor={(item) => item[0]}
-              renderItem={renderItem}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingBottom: 12
-              }}
-            />
-            </View>  
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item[0]}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 12
+        }}
+      />
+    </View>
   )
 }

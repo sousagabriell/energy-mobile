@@ -25,11 +25,12 @@ export const styles = StyleSheet.create({
     bottom: 50
   },
   cardContainer: {
-    borderRadius: 5,
+    marginHorizontal: '5%',
     paddingHorizontal: 24,
+    borderBottomColor: '#002A5E',
+    borderBottomWidth: 3,
     paddingVertical: 17,
     backgroundColor: '#fff',
-    marginBottom: 16
   },
   titleCard: {
     fontSize: RFValue(14)
@@ -128,5 +129,18 @@ export const styles = StyleSheet.create({
   iconQRCode:{
     marginTop: '8%',
     marginLeft: '5%'
-  }
+  },
+  cardFlex:{
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  penEdit: {
+    backgroundColor: '#d8d8d8',
+    borderRadius: 50,
+    marginTop: '4%',
+    height: 25,
+    width: 25,
+  },
 })

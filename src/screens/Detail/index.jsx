@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Text, View, Alert } from 'react-native'
+import { Text, View, Alert, Pressable, Image } from 'react-native'
 import { useRoute, useNavigation } from '@react-navigation/native'
 import { useAuth } from '../../hooks/auth'
 import { useSheet } from '../../hooks/sheet'
@@ -70,10 +70,13 @@ export function Detail() {
   return (
     <View style={styles.container}>
             <HeaderScreens />
-            
+            <Pressable onPress={navigate.goBack} style={styles.titlePage}>
+            <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
+            <Text style={styles.title}>Editar Dado</Text>
+          </Pressable>
       <View style={styles.card}>
-        <Text style={styles.title}>{column}</Text>
-        <Text style={styles.subTitle}>{dataRow}</Text>
+        <Text style={styles.subTitle}>Coluna: {column}</Text>
+        <Text style={styles.subTitle}>Linha: {dataRow}</Text>
         <TextInput
           label="Atualizar"
           returnKeyType="done"
@@ -89,9 +92,6 @@ export function Detail() {
         disabled={!updateRow}
       >
         Atualizar
-      </Button>
-      <Button mode="outlined" onPress={() => navigate.goBack()}>
-        Voltar
       </Button>
     </View>
   )

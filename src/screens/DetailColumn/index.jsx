@@ -1,354 +1,234 @@
-import React, { useEffect } from 'react'
-import { View, StyleSheet, Image, Text, ScrollView, FlatList, TouchableOpacity } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Image, Text, ScrollView, FlatList, TouchableOpacity, Pressable } from 'react-native';
 import { HeaderScreens } from '../../components/HeaderComponents';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useRecoilState } from "recoil";
-import { ProjectAtom } from "../../recoil/atom/projectsAtom";
+import { useRecoilState } from 'recoil';
+import { ProjectAtom } from '../../recoil/atom/projectsAtom';
 import {
   Collapse as CollapseReact,
   CollapseHeader,
   CollapseBody,
 } from 'accordion-collapse-react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Pressable } from 'react-native';
+import { TextInput } from '../../components/TextInput';
+import { Modal } from 'react-native';
 
 
 export function ColumnDetail({ }) {
   const [project, setProjectState] = useRecoilState(ProjectAtom);
   const navigate = useNavigation();
+  const [collapsed, setCollapsed] = useState({});
+  const refs = useRef([]);
+  const [searchText, setSearchText] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [projectUUID, setProjectUUID] = useState('')
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation()
 
 
   useEffect(() => {
-    console.log(project)
-  }, [project, setProjectState])
+    setProjectUUID(project[0].uuid)
+  }, [project, setProjectState,]);
 
+  useEffect(() => {
+    handleSearch(searchText);
+  }, [searchText]);
+  
+  useEffect(() => {
+    initializeCollapsedState();
+  }, [project]);
+
+  const initializeCollapsedState = () => {
+    const newCollapsedState = {};
+    project[0].rows.forEach((_, index) => {
+      newCollapsedState[index] = true;
+    });
+    setCollapsed(newCollapsedState);
+  };
+
+  const toggleCollapse = (index) => {
+    setCollapsed((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
+  };
+  function adicionarValores(objeto) {
+    const chaves = Object.keys(objeto);
+    const retornoNovoObjeto = {};
+
+    for (let i = 0; i < chaves.length; i++) {
+      retornoNovoObjeto[i] = {
+        key: chaves[i],
+        value: objeto[chaves[i]],
+      };
+    }
+    return retornoNovoObjeto;
+  }
+
+  const handleEditButton = () => {
+    setModalVisible(true);
+  };
+
+  let newProject = [];
+  project[0].rows.map(obj => {
+    newProject.push(adicionarValores(obj));
+  });
+
+  function handleSearch(text) {
+    setSearchText(text);
+
+    const results = formatNewProject.filter(item => {
+      const itemValues = Object.values(item).map(obj => {
+        if (typeof obj.value === 'string') {
+          return obj.value.toLowerCase();
+        }
+        return '';
+      });
+
+      return itemValues.some(value => value.includes(text.toLowerCase()));
+    });
+
+    setSearchResults(results);
+  }
+
+  const formatNewProject = newProject.flat();
+
+
+  const renderItem = ({ item, index }) => {
+    const isCollapsed = collapsed[index];
+
+    return (
+      <View style={styles.itemContainer}>
+        <TouchableOpacity onPress={() => toggleCollapse(index)}>
+          <View style={styles.rowContainer}>
+            <Text style={styles.keyText}>
+            {item[1].key}: {item[1].value}
+            </Text>
+            <Image source={require('../../assets/pen.png')} />
+          </View>
+        </TouchableOpacity>
+        {!isCollapsed &&
+          Object.entries(item)
+            .filter(([key]) => key !== 'value')
+            .map(([key, value], index) => {
+              if (Array.isArray(value)) {
+                return null;
+              }
+              value =
+                typeof value === 'object'
+                  ? JSON.stringify(value)
+                      .replace(/"/g, '')
+                      .replace(/[{}]/g, '')
+                  : value;
+              const columnName = value.split(',')[0].replace('key:', '');
+              const dataRow = value
+                .split(',')
+                .slice(1)
+                .join(',')
+                .trim()
+                .replace('value:', '');
+
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => toggleCollapse(index)}
+                >
+                  <View
+                    style={styles.rowCollapse}
+                    ref={(element) => (refs.current[key] = element)}
+                  >
+                    <Text style={styles.valueText}>{`${value}`}</Text>
+                    <TouchableOpacity
+                      style={styles.editButton}
+                      onPress={() =>
+                        navigation.navigate('Detalhe', {
+                          column: columnName,
+                          dataRow: dataRow,
+                          projectUUID,
+                          rowID: item[0].value,
+                        })
+                      }
+                    >
+                      <Text style={styles.editButtonText}>Editar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+      </View>
+    );
+  };
+
+
+  if (formatNewProject.length === 0) {
+    return (
+      <View style={styles.container}>
+        <HeaderScreens />
+        <View>
+          <Pressable onPress={navigate.goBack} style={styles.titlePage}>
+            <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
+            <Text style={styles.title}>Informações do Projeto</Text>
+          </Pressable>
+          <Text style={styles.errorText}>Não foram encontrados dados!</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <HeaderScreens />
-      <View>
-        <Pressable onPress={navigate.goBack} style={styles.titlePage}>
-          <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
-          <Text style={styles.title}>Informações do Projeto</Text>
-        </Pressable>
-      </View>
-      {project[0]}
-      <ScrollView>
-        {project.map(singleProject => {
-          return <>
-            <View style={styles.data}>
-              <CollapseReact key={singleProject['id']}>
-                <CollapseHeader style={styles.headerCollapse}>
-                  <Text style={styles.numeroLinha}>Linha:{singleProject['id']}</Text>
-                  <Image source={require('../../assets/pen.png')} style={styles.penEdit} />
-                </CollapseHeader>
-                <CollapseBody>
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Usar Código Ativo:{singleProject['Usar Código Ativo']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Usar Código Ativo:{singleProject['Usar Código Ativo']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Descrição Ativo:{singleProject['Descrição Ativo']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Código Ativo:{singleProject['Código Ativo']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Complemento Localização:{singleProject['Complemento Localização']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Código At:{singleProject['Código At']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Código Instalação:{singleProject['Código Instalação']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Código Localização:{singleProject['Código Localização']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Descrição Localização:{singleProject['Descrição Localização']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Ativo Pai:{singleProject['Ativo Pai']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Ativo Real:{singleProject['Ativo Real']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Descrição Instalação:{singleProject['Descrição Instalação']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Descrição Localização:{singleProject['Descrição Localização']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Tipo Instalação:{singleProject['Tipo Instalação']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Esfeera de Sinalização danificada:{singleProject['ESFERADE SINALIZAÇÃO DANIFICADA']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Inspeção terrestre na torre:{singleProject['INSPEÇÃO TERRESTRE NA TORRE']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Data Inspeção por Drone na Torre:{singleProject['DATA INSPEÇÃO POR DRONE NA TORRE']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Data Termografia:{singleProject['DATA TERMOGRAFIA']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Anomalia via Termografia na Torre:{singleProject['ANOMALIA VIA TERMOGRAFIA NA TORRE']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Data da Última Corretiva na Torre:{singleProject['DATA DA ULTIMA CORRETIVA NA TORRE']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Registro de Desligamento Fase Terra:{singleProject['REGISTRO DE DESLIGAMENTO FASE TERRA']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Registro de Desligamento Fase-Fase:{singleProject['REGISTRO DE DESLIGAMENTO FASE-FASE']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Registro Fotográfico da Torre:{singleProject['REGISTRO FOTOGRÁFICO DA TORRE']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Nome do Proprietário Local:{singleProject['NOME DO PROPRIETÁRIO LOCAL']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Estrutura:{singleProject['ESTRUTURA']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Presença de abelhas/incetos:{singleProject['Presença de abelhas/incetos']}</Text>
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Arvores para Poda Seletiva:{singleProject['ARVORES PARA PODA SELETIVA']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Registro de Queimada:{singleProject['REGISTRO DE QUEIMADA']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>Invasão da Faixa de Servidão/Torre:{singleProject['INVASÃO DA FAIXA DE SERVIDÃO/ÁREA DA TORRE']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ACESSO DANIFICADO:{singleProject['ACESSO DANIFICADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ACESSO ALAGADO:{singleProject['ACESSO ALAGADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>VANDALISMO NA TORRE:{singleProject['VANDALISMO NA TORRE']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>DEFENSAS NA TORRE:{singleProject['DEFENSAS NA TORRE']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>DEFENSAS NOS ESTAIS:{singleProject['DEFENSAS NOS ESTAIS']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>DEFENSAS DANIFICADAS:{singleProject['DEFENSAS DANIFICADAS']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>TORRE SUBMERSA:{singleProject['TORRE SUBMERSA']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>FUNDAÇÃO DANIFICADA:{singleProject['FUNDAÇÃO DANIFICADA']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>FUNDAÇÃO COM EROSÃO:{singleProject['FUNDAÇÃO COM EROSÃO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>FORMIGUEIRO:{singleProject['FORMIGUEIRO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>CURSO D'AGUA NA BASE:{singleProject["CURSO D'AGUA NA BASE"]}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>EDIFICAÇÃO CONSTRUIDA:{singleProject['EDIFICAÇÃO CONSTRUIDA']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>TRELIÇAS DANIFICADAS/ parafusos ou componentes folgados:{singleProject['TRELIÇAS DANIFICADAS/ parafusos ou componentes folgados']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>PLACA DE SINALIZAÇÃO DANIFICADA:{singleProject['PLACA DE SINALIZAÇÃO DANIFICADA']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>PLACAS DE SINALIZAÇÃO AUSENTE:{singleProject['PLACAS DE SINALIZAÇÃO AUSENTE']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ATERRAMENTO EXPOSTO:{singleProject['ATERRAMENTO EXPOSTO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ATERRAMENTO DANIFICADO:{singleProject['ATERRAMENTO DANIFICADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ATERRAMENTO AUSENTE:{singleProject['ATERRAMENTO AUSENTE']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ESTAI ROMPIDO:{singleProject['ESTAI ROMPIDO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ESTAI MAL TENSIONADO/ANOMALIAS NAS CONEXÕES:{singleProject['ESTAI MAL TENSIONADO/ANOMALIAS NAS CONEXÕES']}</Text>
-
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>REGISTRO DE ISOLADOR QUEBRADO:{singleProject['REGISTRO DE ISOLADOR QUEBRADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>REGISTRO DE DESCARGA ATMOSFERICA:{singleProject['REGISTRO DE DESCARGA ATMOSFERICA']}</Text>
-
-                  </View>
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>REGISTRO DE VANDALISMO NA TORRE:{singleProject['REGISTRO DE VANDALISMO NA TORRE']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>REGISTRO DE POLUIÇÃO EXTREMA NO ISOLADOR:{singleProject['REGISTRO DE POLUIÇÃO EXTREMA NO ISOLADOR']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>TENTOS ROMPIDOS:{singleProject['TENTOS ROMPIDOS']}</Text>
-                  </View>
-
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>GRAMPO DE ANCORAGEM DANIFICADO:{singleProject['GRAMPO DE ANCORAGEM DANIFICADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>JUMP DE ATERRAMENTO ABERTO:{singleProject['JUMP DE ATERRAMENTO ABERTO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>GRAMPO DE ATERRAMENTO DANIFICADO:{singleProject['GRAMPO DE ATERRAMENTO DANIFICADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>CAIXA DE EMENDA OPGW DANIFICADA:{singleProject['CAIXA DE EMENDA OPGW DANIFICADA']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>CABO CONDUTOR DANIFICADO:{singleProject['CABO CONDUTOR DANIFICADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>CABO PARA-RAIOS/OPGW DANIFICADO:{singleProject['CABO PARA-RAIOS/OPGW DANIFICADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>AMORTECEDOR DESLOCADO:{singleProject['AMORTECEDOR DESLOCADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>AMORTECEDOR REMOVIDO:{singleProject['AMORTECEDOR REMOVIDO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>ESPAÇADOR DANIFICADO:{singleProject['ESPAÇADOR DANIFICADO']}</Text>
-                  </View>
-
-
-                  <View style={styles.listBorder}>
-                    <Text style={styles.lineList}>AMORTECEDOR PR/OPGW DANIFICADO:{singleProject['AMORTECEDOR PR/OPGW DANIFICADO']}</Text>
-                  </View>
-                </CollapseBody>
-              </CollapseReact>
-            </View>
-          </>
-        })
-
-        }
-      </ScrollView>
+      {project.map((obj) => {
+        return (
+          <View>
+            <Pressable onPress={navigate.goBack} style={styles.titlePage}>
+              <Image source={require('../../assets/flecha.png')} style={styles.iconProject} />
+              <Text style={styles.title}>{obj.name}</Text>
+            </Pressable>
+          </View>
+        )
+      })}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Digite sua busca..."
+        value={searchText}
+        onChangeText={handleSearch}
+      />
+      <FlatList
+        data={searchResults.length > 0 ? searchResults : formatNewProject}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+      />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Editar Item</Text>
+          <TouchableOpacity
+            style={styles.modalCloseButton}
+          >
+            <Text style={styles.modalCloseButtonText}>Editar dado</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalCloseButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.modalCloseButtonText}>Tirar Foto</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalCloseButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.modalCloseButtonText}>Fechar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
-
-
 
 const styles = StyleSheet.create({
 
@@ -421,5 +301,82 @@ const styles = StyleSheet.create({
     marginTop: 6,
     height: 25,
     width: 25,
-  }
+  },
+  itemContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginHorizontal: '5%',
+    padding: '5%',
+    marginBottom: '2%',
+    marginTop: '2%',
+  },
+  keyText: {
+    fontWeight: 'bold',
+    color: '#002A5E',
+    fontSize: RFValue(18),
+  },
+  valueText: {
+    flex: 1,
+  },
+  rowCollapse: {
+    borderBottomColor: '#002A5E',
+    borderBottomWidth: 3,
+    padding: '2%',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    textAlign: 'center',
+    marginTop: RFValue(20),
+    fontSize: RFValue(16),
+    fontWeight: 'bold',
+  },
+  editButton: {
+    backgroundColor: '#002A5E',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginLeft: 10,
+  },
+  editButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  searchContainer: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    borderRadius: 5,
+  },
+  searchInput: {
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#002A5E',
+    marginBottom: 16,
+  },
+  modalCloseButton: {
+    backgroundColor: '#002A5E',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginTop: 20,
+  },
+  modalCloseButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
 })
