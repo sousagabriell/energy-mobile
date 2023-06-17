@@ -33,7 +33,7 @@ export function ColumnDetail({ }) {
   useEffect(() => {
     handleSearch(searchText);
   }, [searchText]);
-  
+
   useEffect(() => {
     initializeCollapsedState();
   }, [project]);
@@ -102,23 +102,22 @@ export function ColumnDetail({ }) {
         <TouchableOpacity onPress={() => toggleCollapse(index)}>
           <View style={styles.rowContainer}>
             <Text style={styles.keyText}>
-            {item[1].key}: {item[1].value}
+              {item[1].key}: {item[1].value}
             </Text>
-            <Image source={require('../../assets/pen.png')} />
           </View>
         </TouchableOpacity>
         {!isCollapsed &&
           Object.entries(item)
             .filter(([key]) => key !== 'value')
-            .map(([key, value], index) => {
+            .map(([key, value], nestedIndex) => {
               if (Array.isArray(value)) {
                 return null;
               }
               value =
                 typeof value === 'object'
                   ? JSON.stringify(value)
-                      .replace(/"/g, '')
-                      .replace(/[{}]/g, '')
+                    .replace(/"/g, '')
+                    .replace(/[{}]/g, '')
                   : value;
               const columnName = value.split(',')[0].replace('key:', '');
               const dataRow = value
@@ -137,28 +136,34 @@ export function ColumnDetail({ }) {
                     style={styles.rowCollapse}
                     ref={(element) => (refs.current[key] = element)}
                   >
-                    <Text style={styles.valueText}>{`${value}`}</Text>
-                    <TouchableOpacity
-                      style={styles.editButton}
-                      onPress={() =>
-                        navigation.navigate('Detalhe', {
-                          column: columnName,
-                          dataRow: dataRow,
-                          projectUUID,
-                          rowID: item[0].value,
-                        })
-                      }
-                    >
-                      <Text style={styles.editButtonText}>Editar</Text>
-                    </TouchableOpacity>
+                    {nestedIndex !== 0 && (
+                      <Text style={styles.valueText}>
+                        {`${value}`.replace(/(key:|value:|id:.*)/g, '').replace(",", ": ")}
+                      </Text>
+                    )}
+                    {nestedIndex !== 0 && dataRow && (
+                      <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() =>
+                          navigation.navigate('Detalhe', {
+                            column: columnName,
+                            dataRow: dataRow,
+                            projectUUID,
+                            rowID: item[0].value,
+                          })
+                        }
+                      >
+            <Image source={require('../../assets/pen.png')} />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </TouchableOpacity>
+
               );
             })}
       </View>
     );
   };
-
 
   if (formatNewProject.length === 0) {
     return (
@@ -174,7 +179,6 @@ export function ColumnDetail({ }) {
       </View>
     );
   }
-
   return (
     <View style={styles.container}>
       <HeaderScreens />
@@ -317,11 +321,14 @@ const styles = StyleSheet.create({
   },
   valueText: {
     flex: 1,
+    paddingTop: 10,
+    fontWeight: 'bold'
   },
   rowCollapse: {
     borderBottomColor: '#002A5E',
     borderBottomWidth: 3,
-    padding: '2%',
+    paddingVertical: '4%',
+    flexDirection: 'row'
   },
   errorContainer: {
     flex: 1,
@@ -335,10 +342,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   editButton: {
-    backgroundColor: '#002A5E',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    backgroundColor: '#ebebeb',
+    borderRadius: 10,
+    height: 40,
+    width:50 ,
+    paddingTop: 10,
+    paddingLeft: 10,
     marginLeft: 10,
   },
   editButtonText: {
@@ -355,6 +364,9 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     fontSize: 16,
+    width: '90%',
+    marginLeft: '5%',
+    backgroundColor: '#ffffff',
   },
   modalContainer: {
     flex: 1,

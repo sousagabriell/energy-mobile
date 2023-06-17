@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, ActivityIndicator, Alert, ScrollView, View, Image } from 'react-native'
+import { StyleSheet, ActivityIndicator, Alert, ScrollView, View, Image, TouchableOpacity, Linking } from 'react-native'
 import { useAuth } from '../../hooks/auth'
 import { theme } from '../../core/theme'
 import { emailValidator, passwordValidator, invalidPassword } from '../../core/utils'
@@ -56,6 +56,13 @@ export function Login({ navigation }) {
 
     return () => removeNetInfoSubscription()
   }, [])
+  const handleLinkedInPress = () => {
+    Linking.openURL('https://www.linkedin.com');
+  };
+
+  const handleWhatsAppPress = () => {
+    Linking.openURL('https://api.whatsapp.com/send?phone=5521988157376');
+  };
   
 
   return (
@@ -101,8 +108,12 @@ export function Login({ navigation }) {
           <Text style={styles.password}>Esqueceu sua senha?</Text>
           <Text style={styles.link}  onPress={() => navigation.navigate('RecuperarSenha')}>Recuperar Senha</Text>
           <View style={styles.socialmedia}>
-          <Image style={styles.linkedin} source={require('../../assets/linkedin.png')}  />
-          <Image style={styles.whatsapp} source={require('../../assets/whatsapp.png')}  />
+          <TouchableOpacity onPress={handleLinkedInPress}>
+        <Image style={styles.linkedin} source={require('../../assets/linkedin.png')} />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleWhatsAppPress}>
+        <Image style={styles.whatsapp} source={require('../../assets/whatsapp.png')} />
+      </TouchableOpacity>
           </View>
         </>
       ) : (

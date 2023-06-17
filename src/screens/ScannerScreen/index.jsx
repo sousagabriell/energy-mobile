@@ -3,8 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import { Button } from '../../components/Button';
-import { HeaderScreens } from '../../components/HeaderComponents';
-import { HeaderScan } from '../../components/HeaderScan';
 
 export default function ScannerScreen() {
   const navigation = useNavigation()
@@ -26,6 +24,9 @@ export default function ScannerScreen() {
 
     setScannedCodes([]);
   };
+  useEffect(() => {
+    startScan()
+  }, [])
 
   const renderScanner = () => (
     <BarCodeScanner
@@ -36,8 +37,6 @@ export default function ScannerScreen() {
 
   const renderResults = () => (
     <View style={styles.container}>
-                  <HeaderScan />
-
       <Button
         style={styles.button}
         onPress={startScan}
@@ -48,9 +47,6 @@ export default function ScannerScreen() {
     </View>
   );
 
-    useCallback(() => {
-      startScan();
-    }, [])
 
 
   return scannedCodes.length ? renderResults() : renderScanner();

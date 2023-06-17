@@ -62,10 +62,6 @@ export function NewHome() {
 
                             <Text style={styles.titleProject}>{obj.name}</Text>
                             <Text style={styles.subtitleProject}>{obj.size_files_project}</Text>
-                                <Image
-                                    source={{ uri: obj.groups[0].thumbnail }}
-                                    style={{ width: 100, height: 100 }}
-                                />
                             <View>
                                 <Button mode="contained" style={styles.btnMore} onPress={() => getColumns(obj.id)}>
                                     Ver Mais
