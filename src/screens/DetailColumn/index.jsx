@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Image, Text, ScrollView, FlatList, TouchableOpacity, Pressable } from 'react-native';
+import { View, StyleSheet, Image, Text, ScrollView, FlatList, TouchableOpacity, Pressable, Linking } from 'react-native';
 import { HeaderScreens } from '../../components/HeaderComponents';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useRecoilState } from 'recoil';
@@ -12,6 +12,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { TextInput } from '../../components/TextInput';
 import { Modal } from 'react-native';
+import { Button } from '../../components/Button';
 
 
 export function ColumnDetail({ }) {
@@ -23,6 +24,7 @@ export function ColumnDetail({ }) {
   const [searchResults, setSearchResults] = useState([]);
   const [projectUUID, setProjectUUID] = useState('')
   const [modalVisible, setModalVisible] = useState(false);
+  const [ExtraFiles, setExtraFiles] = useState(false);
   const navigation = useNavigation()
 
 
@@ -65,8 +67,10 @@ export function ColumnDetail({ }) {
     return retornoNovoObjeto;
   }
 
-  const handleEditButton = () => {
+  const handleEditButton = (obj) => {
     setModalVisible(true);
+    setExtraFiles(project[0].rows[obj].extra_files)
+    console.log(ExtraFiles);
   };
 
   let newProject = [];
@@ -91,6 +95,10 @@ export function ColumnDetail({ }) {
     setSearchResults(results);
   }
 
+  function openFile(obj) {
+    Linking.openURL('http://54.196.176.154' + obj)
+  }
+
   const formatNewProject = newProject.flat();
 
 
@@ -99,13 +107,18 @@ export function ColumnDetail({ }) {
 
     return (
       <View style={styles.itemContainer}>
-        <TouchableOpacity onPress={() => toggleCollapse(index)}>
-          <View style={styles.rowContainer}>
-            <Text style={styles.keyText}>
-              {item[1].key}: {item[1].value}
-            </Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.headerCollapse}>
+          <TouchableOpacity onPress={() => toggleCollapse(index)}>
+            <View style={styles.rowContainer}>
+              <Text style={styles.keyText}>
+                {item[1].key}: {item[1].value}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnClips} onPress={() => handleEditButton(index)}>
+            <Image source={require('../../assets/clipe.png')} style={styles.editButtonIcon} />
+          </TouchableOpacity>
+        </View>
         {!isCollapsed &&
           Object.entries(item)
             .filter(([key]) => key !== 'value')
@@ -142,6 +155,7 @@ export function ColumnDetail({ }) {
                       </Text>
                     )}
                     {nestedIndex !== 0 && dataRow && (
+
                       <TouchableOpacity
                         style={styles.editButton}
                         onPress={() =>
@@ -153,7 +167,7 @@ export function ColumnDetail({ }) {
                           })
                         }
                       >
-            <Image source={require('../../assets/pen.png')} />
+                        <Image source={require('../../assets/pen.png')} />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -210,24 +224,28 @@ export function ColumnDetail({ }) {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Editar Item</Text>
-          <TouchableOpacity
-            style={styles.modalCloseButton}
-          >
-            <Text style={styles.modalCloseButtonText}>Editar dado</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.modalCloseButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.modalCloseButtonText}>Tirar Foto</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.modalCloseButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.modalCloseButtonText}>Fechar</Text>
-          </TouchableOpacity>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Arquivos indexados</Text>
+            {Array.isArray(ExtraFiles) ? (
+              ExtraFiles.map((file, index) => (
+                <ScrollView>
+                  <TouchableOpacity style={styles.headerCollapse} key={index} onPress={() => openFile(file)}>
+                    <Image source={require('../../assets/documento.png')} style={styles.iconProject} />
+                    <Text style={styles.link}>{file}</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              ))
+            )
+              : (
+                <Text>No Extra Files available</Text>
+              )}
+            <Button mode="contained" style={styles.btnPhoto} onPress={() => navigation.navigate('NewFilePhoto')}>
+              Inserir Foto
+            </Button>
+            <Button mode="contained"  style={styles.btnExit} onPress={() => setModalVisible(false)}>
+              Fechar Janela
+            </Button>
+          </View>
         </View>
       </Modal>
     </View>
@@ -308,7 +326,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 5,
     marginHorizontal: '5%',
     padding: '5%',
     marginBottom: '2%',
@@ -345,7 +363,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ebebeb',
     borderRadius: 10,
     height: 40,
-    width:50 ,
+    width: 50,
     paddingTop: 10,
     paddingLeft: 10,
     marginLeft: 10,
@@ -374,11 +392,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+  modalHeader: {
+    backgroundColor: '#fff',
+    height: '70%',
+    marginHorizontal: '10%',
+    padding: '5%',
+    borderRadius: 10,
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#002A5E',
     marginBottom: 16,
+    paddingBottom: 10,
+    borderBottomColor: '#002A5E',
+    borderBottomWidth: 3,
   },
   modalCloseButton: {
     backgroundColor: '#002A5E',
@@ -391,4 +419,24 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
+  editButtonIcon: {
+    width: 20,
+    height: 20,
+    marginLeft: 10,
+  },
+  btnClips: {
+    borderColor: '#002A5E',
+    borderWidth: 2,
+    padding: '1%',
+    paddingRight: '4%',
+    borderRadius: 10,
+  },
+  btnPhoto: {
+    width: 280,
+    backgroundColor: '#002A5E',
+  },
+  btnExit: {
+    width: 280,
+    backgroundColor: '#c2c2c2',
+  }
 })
